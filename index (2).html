@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday, Sana</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b0e2a;--dusk:#1c2058;--flame:#ffb347;--rose:#f4a0bd;--cream:#fff3dc;
+--serif:"Cormorant Garamond",Georgia,serif}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 85%,var(--dusk),var(--ink) 70%);color:var(--cream);
+font-family:var(--serif);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
+transition:background 1.5s}
+body.dark{background:radial-gradient(ellipse at 50% 85%,#14173f,#05061a 75%)}
+canvas{position:fixed;inset:0;pointer-events:none}
+#stars{z-index:0}#fx{z-index:5}
+main{position:relative;z-index:2;text-align:center;padding:1rem;width:100%;max-width:640px}
+h1{font-weight:500;font-style:italic;font-size:clamp(2rem,7vw,3.4rem);line-height:1.1;margin-bottom:.4rem}
+.sub{font-size:clamp(1.05rem,3.6vw,1.35rem);opacity:.8;min-height:1.6em;transition:opacity .6s}
+
+/* cake */
+.cake{position:relative;width:240px;margin:2.6rem auto 1.6rem;height:170px}
+.tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:10px 10px 6px 6px}
+.t1{bottom:0;width:240px;height:70px;background:var(--rose)}
+.t2{bottom:70px;width:170px;height:56px;background:#f7c5d6}
+.t1:before,.t2:before{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:var(--cream);
+border-radius:10px 10px 14px 14px;opacity:.95}
+.plate{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:290px;height:12px;border-radius:50%;
+background:#2b2f78}
+.candles{position:absolute;bottom:126px;left:50%;transform:translateX(-50%);display:flex;gap:16px}
+.candle{position:relative;width:8px;height:38px;border-radius:3px;background:linear-gradient(var(--cream),#e8d3b0)}
+.candle:nth-child(odd){background:linear-gradient(#cfe3ff,#9bbbea)}
+.flame{position:absolute;left:50%;bottom:100%;margin-bottom:2px;width:14px;height:24px;transform:translateX(-50%);
+background:radial-gradient(ellipse at 50% 75%,#fff6c9 10%,var(--flame) 50%,rgba(255,140,40,0) 72%);
+border-radius:50% 50% 50% 50%/65% 65% 35% 35%;filter:drop-shadow(0 0 12px var(--flame));
+transform-origin:50% 100%;animation:flick .18s infinite alternate}
+@keyframes flick{from{transform:translateX(-50%) scale(1,1) rotate(calc(-2deg + var(--lean,0deg)))}to{transform:translateX(-50%) scale(.92,1.08) rotate(calc(2deg + var(--lean,0deg)))}}
+.candle.out .flame{animation:none;opacity:0;transform:translateX(-50%) scale(.2);transition:all .35s}
+.smoke{position:absolute;left:50%;bottom:100%;width:4px;height:4px;border-radius:50%;background:#cfd3ff;opacity:0}
+.candle.out .smoke{animation:smoke 2s ease-out}
+@keyframes smoke{0%{opacity:.7;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-30%,-60px) scale(8)}}
+.glow{position:absolute;left:50%;bottom:90px;width:360px;height:260px;transform:translateX(-50%);
+background:radial-gradient(circle,rgba(255,179,71,.28),transparent 65%);transition:opacity 1.2s;pointer-events:none}
+.dark .glow{opacity:0}
+
+button{font:inherit;font-size:1.2rem;font-style:italic;color:var(--ink);background:var(--flame);border:0;
+padding:.7rem 1.8rem;border-radius:999px;cursor:pointer;transition:transform .2s,opacity .5s}
+button:hover{transform:scale(1.05)}
+button:focus-visible{outline:3px solid var(--cream);outline-offset:3px}
+.hint{display:block;margin-top:.8rem;font-size:1rem;opacity:.6}
+
+/* message */
+#msg{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;
+padding:1.5rem;text-align:center;opacity:0;pointer-events:none;transition:opacity 1.5s}
+#msg.show{opacity:1;pointer-events:auto}
+#msg p{font-size:clamp(1.15rem,3.8vw,1.6rem);line-height:1.5;max-width:30em;margin:.55rem 0;opacity:0;transform:translateY(10px);
+transition:opacity 1.4s,transform 1.4s}
+#msg p.in{opacity:1;transform:none}
+#msg h2{font-style:italic;font-weight:600;font-size:clamp(2.2rem,9vw,4rem);color:var(--rose);margin-bottom:.6rem;
+opacity:0;transition:opacity 1.5s}
+#msg h2.in{opacity:1}
+#msg .sig{font-style:italic;color:var(--flame);margin-top:1.2rem}
+#again{margin-top:1.8rem;background:transparent;color:var(--cream);border:1px solid rgba(255,243,220,.4);font-size:1rem;padding:.5rem 1.2rem}
+.hide{opacity:0!important;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.flame{animation:none}#msg p,#msg h2{transition:none}}
+
+/* surprise gift */
+#stage{transition:opacity 1.6s}
+#gift{position:fixed;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;
+text-align:center;transition:opacity 1.2s;padding:1rem}
+#gift.gone{opacity:0;pointer-events:none}
+#gift p{font-style:italic;font-size:clamp(1.3rem,5vw,1.8rem);margin-bottom:2.4rem}
+.box{position:relative;width:150px;height:120px;cursor:pointer;border:0;background:none;padding:0;
+animation:bob 2.4s ease-in-out infinite}
+.box:focus-visible{outline:3px solid var(--cream);outline-offset:14px}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-1.5deg)}}
+.base{position:absolute;bottom:0;width:150px;height:90px;background:var(--rose);border-radius:4px}
+.base:after,.lid:after{content:"";position:absolute;left:50%;top:0;bottom:0;width:22px;transform:translateX(-50%);background:var(--flame)}
+.lid{position:absolute;top:0;left:-8px;width:166px;height:34px;background:#f7c5d6;border-radius:4px;
+transition:transform .9s cubic-bezier(.2,.8,.3,1),opacity .9s}
+.bow{position:absolute;left:50%;top:-22px;width:46px;height:26px;transform:translateX(-50%);
+border:6px solid var(--flame);border-radius:50% 50% 0 0}
+.box.open{animation:none}
+.box.open .lid{transform:translateY(-170px) rotate(-28deg);opacity:0}
+.box .burst{position:absolute;left:50%;top:30%;width:10px;height:10px;border-radius:50%;transform:translate(-50%,-50%);
+background:#fff6c9;opacity:0;box-shadow:0 0 60px 30px var(--flame)}
+.box.open .burst{animation:burst 1.1s ease-out}
+@keyframes burst{0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}100%{opacity:0;transform:translate(-50%,-50%) scale(18)}}
+.tap{margin-top:2.4rem;font-style:italic;opacity:.7;transition:opacity .4s}
+@media(prefers-reduced-motion:reduce){.box{animation:none}}
+.mute{position:fixed;right:14px;bottom:14px;z-index:9;width:42px;height:42px;padding:0;font-size:1.2rem;
+background:rgba(255,243,220,.12);color:var(--cream);border:1px solid rgba(255,243,220,.3)}
+
+/* boot terminal */
+#boot{position:fixed;inset:0;z-index:8;background:#05061a;display:flex;align-items:center;justify-content:center;transition:opacity 1.2s;cursor:pointer}
+#boot.gone{opacity:0;pointer-events:none}
+#bootlog{font:clamp(.8rem,3.4vw,1.05rem)/1.9 ui-monospace,Menlo,Consolas,monospace;color:var(--flame);padding:1.5rem;max-width:560px;width:100%}
+#bootlog div:last-child:after{content:"\2588";margin-left:4px;animation:bl .6s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.meter{width:160px;height:5px;margin:.7rem auto 0;border-radius:3px;background:rgba(255,243,220,.15);overflow:hidden;opacity:0;transition:opacity .4s}
+.meter.on{opacity:1}.meter i{display:block;height:100%;width:0;background:var(--flame)}
+#msg .code{font:.9rem ui-monospace,Menlo,Consolas,monospace;opacity:.6;margin-top:.2rem}
+#again{opacity:0}#again.in{opacity:1}
+</style>
+</head>
+<body>
+<section id="boot"><div id="bootlog"></div></section>
+<canvas id="stars"></canvas><canvas id="fx"></canvas>
+
+<section id="gift">
+  <p>Sana, there is something here for you.</p>
+  <button class="box" id="box" aria-label="Open your surprise">
+    <div class="base"></div><div class="lid"><div class="bow"></div></div><div class="burst"></div>
+  </button>
+  <span class="tap" id="tap">tap to open</span>
+</section>
+
+<main id="stage" class="hide">
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="cake" aria-hidden="true">
+    <div class="glow"></div>
+    <div class="candles" id="candles"></div>
+    <div class="tier t2"></div><div class="tier t1"></div><div class="plate"></div>
+  </div>
+  <button id="blow">Blow the candles</button>
+  <span class="hint" id="hint">or just blow into your mic</span>
+  <div class="meter" id="meter"><i id="mi"></i></div>
+</main>
+
+<section id="msg" aria-live="polite"></section>
+
+<button class="mute" id="mute" aria-label="Mute music">&#9835;</button>
+
+<script>
+/* ===== EDIT THIS PART ===== */
+const CONFIG = {
+  name: "Sana",
+  from: "Talha",
+  candles: 5,
+  intro: "Close your eyes. Make a wish.",
+  lines: [
+    "Some people make the world a little quieter, a little kinder, just by being in it.",
+    "You are one of them.",
+    "I hope this year gives you everything you've been quietly hoping for,",
+    "and that you always know how much you're loved.",
+    "I'm really grateful you exist."
+  ]
+};
+/* ========================== */
+
+const $ = id => document.getElementById(id);
+$("title").textContent = "Happy Birthday, " + CONFIG.name;
+$("sub").textContent = CONFIG.intro;
+document.title = "Happy Birthday, " + CONFIG.name;
+
+const candlesEl = $("candles");
+function lightCandles(){
+  candlesEl.innerHTML = "";
+  for(let i=0;i<CONFIG.candles;i++){
+    const c = document.createElement("div");
+    c.className = "candle";
+    c.innerHTML = '<div class="flame"></div><div class="smoke"></div>';
+    candlesEl.appendChild(c);
+  }
+}
+lightCandles();
+
+/* starfield */
+const sc = $("stars"), sx = sc.getContext("2d");
+let stars = [];
+function sizeStars(){
+  sc.width = innerWidth; sc.height = innerHeight;
+  stars = Array.from({length:110},()=>({x:Math.random()*sc.width,y:Math.random()*sc.height*.85,
+    r:Math.random()*1.3+.2,p:Math.random()*6}));
+}
+sizeStars(); addEventListener("resize", sizeStars);
+(function drawStars(t){
+  sx.clearRect(0,0,sc.width,sc.height);
+  for(const s of stars){
+    sx.globalAlpha = .35 + .35*Math.sin(t/900 + s.p);
+    sx.fillStyle = "#fff3dc"; sx.beginPath(); sx.arc(s.x,s.y,s.r,0,7); sx.fill();
+  }
+  requestAnimationFrame(drawStars);
+})(0);
+
+/* confetti */
+const fc = $("fx"), fx = fc.getContext("2d");
+let bits = [], running = false;
+function sizeFx(){ fc.width = innerWidth; fc.height = innerHeight; }
+sizeFx(); addEventListener("resize", sizeFx);
+function confetti(n){
+  const cols = ["#ffb347","#f4a0bd","#fff3dc","#9bbbea","#c9a7ff"];
+  for(let i=0;i<n;i++) bits.push({x:fc.width/2,y:fc.height*.6,vx:(Math.random()-.5)*14,vy:-Math.random()*16-4,
+    w:Math.random()*7+4,h:Math.random()*4+3,a:Math.random()*6,va:(Math.random()-.5)*.4,c:cols[i%cols.length],life:1});
+  if(!running){ running = true; requestAnimationFrame(tick); }
+}
+function firework(x,y){
+  const c = ["#ffb347","#f4a0bd","#9bbbea","#c9a7ff","#fff3dc"][Math.random()*5|0];
+  for(let i=0;i<48;i++){ const a=i/48*6.283, sp=2+Math.random()*4;
+    bits.push({k:1,x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,c,life:1}); }
+  if(!running){ running = true; requestAnimationFrame(tick); }
+}
+function tick(){
+  fx.clearRect(0,0,fc.width,fc.height);
+  bits = bits.filter(b=>b.life>0 && b.y<fc.height+20);
+  for(const b of bits){
+    fx.save(); fx.globalAlpha = Math.max(b.life,0); fx.fillStyle = b.c;
+    if(b.k){
+      b.vy += .05; b.vx *= .985; b.vy *= .985; b.x += b.vx; b.y += b.vy; b.life -= .014;
+      fx.shadowColor = b.c; fx.shadowBlur = 8; fx.beginPath(); fx.arc(b.x,b.y,2,0,7); fx.fill();
+    }else{
+      b.vy += .25; b.vx *= .99; b.x += b.vx; b.y += b.vy; b.a += b.va; b.life -= .004;
+      fx.translate(b.x,b.y); fx.rotate(b.a); fx.fillRect(-b.w/2,-b.h/2,b.w,b.h);
+    }
+    fx.restore();
+  }
+  if(bits.length) requestAnimationFrame(tick); else running = false;
+}
+
+/* blowing */
+let blown = false, micStream = null;
+function blowOut(){
+  if(blown) return; blown = true;
+  stopMic(); $("meter").classList.remove("on"); candlesEl.style.setProperty("--lean","0deg");
+  const cs = [...document.querySelectorAll(".candle")];
+  cs.forEach((c,i)=>setTimeout(()=>c.classList.add("out"), i*220));
+  $("blow").classList.add("hide"); $("hint").classList.add("hide");
+  setTimeout(()=>{ document.body.classList.add("dark"); $("sub").style.opacity = 0; }, cs.length*220+300);
+  setTimeout(showMessage, cs.length*220+1800);
+}
+$("blow").addEventListener("click", blowOut);
+
+async function startMic(){
+  try{
+    micStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const an = ctx.createAnalyser(); an.fftSize = 512;
+    ctx.createMediaStreamSource(micStream).connect(an);
+    const buf = new Uint8Array(an.frequencyBinCount);
+    let loud = 0;
+    (function listen(){
+      if(blown || !micStream) return;
+      an.getByteTimeDomainData(buf);
+      let peak = 0; for(const v of buf) peak = Math.max(peak, Math.abs(v-128));
+      const lvl = Math.min(peak/60,1);
+      candlesEl.style.setProperty("--lean", lvl*38+"deg"); $("mi").style.width = lvl*100+"%";
+      loud = peak > 60 ? loud+1 : 0;           // sustained blow
+      if(loud > 7) return blowOut();
+      requestAnimationFrame(listen);
+    })();
+    $("hint").textContent = "listening... blow at your mic"; $("meter").classList.add("on");
+  }catch(e){ $("hint").textContent = "mic not available, tap the button instead"; }
+}
+function stopMic(){ if(micStream){ micStream.getTracks().forEach(t=>t.stop()); micStream = null; } }
+$("hint").style.cursor = "pointer";
+$("hint").addEventListener("click", startMic);
+
+let msgRun = 0, fwTimer = null;
+async function showMessage(){
+  const run = ++msgRun, m = $("msg");
+  m.innerHTML = '<h2></h2>' + CONFIG.lines.map(()=>"<p></p>").join("") +
+    '<p class="sig"></p><p class="code"></p><button id="again">Light the candles again</button>';
+  m.classList.add("show"); $("stage").classList.add("hide");
+  $("again").addEventListener("click", reset);
+  confetti(180); firework(innerWidth/2, innerHeight*.3);
+  fwTimer = setInterval(()=>firework(innerWidth*(.12+Math.random()*.76), innerHeight*(.1+Math.random()*.4)), 800);
+  const h = m.querySelector("h2"); h.classList.add("in");
+  await type(h, "Happy Birthday, " + CONFIG.name, 70);
+  const ps = [...m.querySelectorAll("p")];
+  const texts = [...CONFIG.lines, "With love, " + CONFIG.from, "// compiled with love. 0 errors. 0 warnings."];
+  for(let i=0;i<ps.length;i++){
+    if(run !== msgRun) return;
+    await wait(400); ps[i].classList.add("in"); await type(ps[i], texts[i], 30);
+  }
+  await wait(900); $("again").classList.add("in");
+}
+function reset(){
+  blown = false; msgRun++; clearInterval(fwTimer); startMic();
+  $("msg").classList.remove("show");
+  document.body.classList.remove("dark");
+  $("stage").classList.remove("hide");
+  $("blow").classList.remove("hide");
+  $("hint").classList.remove("hide"); $("hint").textContent = "or just blow into your mic";
+  $("sub").style.opacity = .8;
+  lightCandles();
+}
+
+
+/* Happy Birthday melody, synthesized (no audio file needed) */
+let actx = null, master = null, muted = false;
+const F = {C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,B4:493.88,C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99};
+const TUNE = [["G4",.75],["G4",.25],["A4",1],["G4",1],["C5",1],["B4",2],
+              ["G4",.75],["G4",.25],["A4",1],["G4",1],["D5",1],["C5",2],
+              ["G4",.75],["G4",.25],["G5",1],["E5",1],["C5",1],["B4",1],["A4",2],
+              ["F5",.75],["F5",.25],["E5",1],["C5",1],["D5",1],["C5",2]];
+function playTune(){
+  try{
+    actx = new (window.AudioContext||window.webkitAudioContext)();
+    master = actx.createGain(); master.gain.value = muted ? 0 : .5; master.connect(actx.destination);
+    let t = actx.currentTime + .1; const beat = .56;
+    for(const [n,d] of TUNE){
+      for(const [type,mult,vol] of [["sine",1,.5],["triangle",2,.12]]){
+        const o = actx.createOscillator(), g = actx.createGain();
+        o.type = type; o.frequency.value = F[n]*mult;
+        g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.02);
+        g.gain.exponentialRampToValueAtTime(.001,t+d*beat+.5);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t+d*beat+.55);
+      }
+      t += d*beat;
+    }
+  }catch(e){}
+}
+$("mute").addEventListener("click",()=>{
+  muted = !muted; if(master) master.gain.value = muted ? 0 : .5;
+  $("mute").style.opacity = muted ? .4 : 1;
+});
+
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+async function type(el,t,ms){ for(const ch of t){ if(!el.isConnected) return; el.textContent += ch; await wait(ms); } }
+
+/* surprise open */
+let opened = false;
+function openGift(){
+  if(opened) return; opened = true;
+  $("box").classList.add("open"); playTune(); startMic(); $("tap").style.opacity = 0;
+  setTimeout(()=>confetti(90), 350);
+  setTimeout(()=>{ $("gift").classList.add("gone"); $("stage").classList.remove("hide"); }, 1500);
+}
+$("box").addEventListener("click", openGift);
+
+/* boot sequence */
+const BOOT = ["> booting sana_birthday.exe ...","> loading happiness.dll ........ OK",
+  "> scanning today for bugs ..... 0 found","> compiling wishes ............. 100%",
+  "> WARNING: someone special detected",'> target = "' + CONFIG.name + '"',"> unlocking surprise_"];
+$("boot").addEventListener("click",()=>$("boot").classList.add("gone"));
+(async function(){
+  for(const l of BOOT){ const d = document.createElement("div"); $("bootlog").appendChild(d); await type(d,l,24); await wait(280); }
+  await wait(800); $("boot").classList.add("gone");
+})();
+</script>
+</body>
+</html>
